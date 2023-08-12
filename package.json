@@ -1,6 +1,6 @@
 {
   "name": "metronomes-controller",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Proof of Concept for multiple metronomes back end",
   "main": "index.ts",
   "types": "./dist/index.d.ts",
@@ -9,12 +9,13 @@
     "postbuild": "npm pack",
     "pack": "npm pack",
     "publish": "npm publish --access public",
-    "postinstall": "npm run build && npm pack && npm run publish",
+    "packandpublish": "npm run pack && npm run publish",
+    "postinstall": "npm run build && npm run packandpublish",
     "test": "ts-node ./node_modules/jasmine/bin/jasmine"
   },
   "devDependencies": {
     "@types/jasmine": "^4.3.5",
-    "@types/node": "^20.4.4",
+    "@types/node": "^20.4.10",
     "husky": "^8.0.3",
     "jasmine": "^5.1.0",
     "jasmine-core": "^5.1.0",

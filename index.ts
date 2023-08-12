@@ -64,7 +64,6 @@ export function getBlueRondoALaTurkFirstMeasureBuilder(): Array<ClicksBuilder> {
         rondoLeftHand
     ]
 }
-
 export function getHemiolaBuilder(): Array<ClicksBuilder> {
     const triplets = new ClicksBuilder()
         .withId(hemiolaTripletsLabel)
