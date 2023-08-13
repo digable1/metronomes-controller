@@ -439,4 +439,30 @@ describe(`Package Test basic metronomes should at least somewhat work`, () => {
 
         jasmine.clock().uninstall();
     });
+
+    it(`Should stop currently running metronome`, () => {
+        jasmine.clock().install().mockDate();
+
+        const startMetronome = {
+            clicks: [
+                getQuarterNotesBuilder_4_4()[0].withCallback(quarternoteCallback).build()
+            ]
+        }
+        quarternoteCallbackAttributes.currentId = quarternotes44Label;
+        quarternoteCallbackAttributes.currentDuration = Array.isArray(startMetronome.clicks[0].heartbeats) ? startMetronome.clicks[0].heartbeats[startMetronome.clicks[0].clickIndex]
+            : startMetronome.clicks[0].heartbeats;
+
+        start(startMetronome);
+
+        jasmine.clock().tick(1000);
+        expect(quarternoteCallbackAttributes.callbackRun).withContext(`Second quarter note for started metronome callbackRun`).toBeTrue();
+        quarternoteCallbackAttributes.callbackRun = false;
+
+        stop();
+
+        jasmine.clock().tick(1000);
+        expect(quarternoteCallbackAttributes.callbackRun).withContext(`Stopped metronome callbackRun`).toBeFalse();
+
+        jasmine.clock().uninstall();
+    })
 });
