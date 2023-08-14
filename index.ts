@@ -8,8 +8,8 @@ importedMessage();
 
 interface DebugClickRange {
     id: string;
-    start: number,
-    end: number
+    start: number;
+    end: number;
 }
 let debugClickRanges: Array<DebugClickRange> = [{
     id: "",
