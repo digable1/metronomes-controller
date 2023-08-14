@@ -43,7 +43,7 @@ export function getEighthNotesEmphasisBuilder_4_4(): Array<ClicksBuilder> {
     const builderEighthNotes = new ClicksBuilder()
         .withId(eighthnotes44Label)
         .withTempos(120)
-        .withNumberOfClicksPerClickGroup(2)
+        .withNumberOfClicksPerClickGroup(2);
     return [
         builder4_4QuarterNotes,
         builderEighthNotes
