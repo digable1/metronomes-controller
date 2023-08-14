@@ -8,11 +8,12 @@
     "afterinstall": "npm run build && npm run packandpublish",
     "build": "tsc --outDir ./dist",
     "installandeverything": "npm install && npm run afterinstall",
-    "postbuild": "npm pack",
-    "pack": "npm pack",
+    "postbuild": "npm run zaptarballs && npm pack",
+    "pack": "npm run zaptarballs && npm pack",
     "packandpublish": "npm run pack && npm run publish",
     "publish": "npm test && npm publish --access public",
-    "test": "ts-node ./node_modules/jasmine/bin/jasmine"
+    "test": "ts-node ./node_modules/jasmine/bin/jasmine",
+    "zaptarballs": "rm *.tgz || del *.tgz"
   },
   "peerDependencies": {
     "@types/jasmine": "^4.3.5",
