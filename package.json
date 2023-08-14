@@ -1,6 +1,6 @@
 {
   "name": "metronomes-controller",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Proof of Concept for multiple metronomes back end",
   "main": "index.ts",
   "types": "./dist/index.d.ts",
@@ -8,21 +8,23 @@
     "build": "tsc --outDir ./dist",
     "postbuild": "npm pack",
     "pack": "npm pack",
-    "publish": "npm publish --access public",
+    "publish": "npm test && npm publish --access public",
     "packandpublish": "npm run pack && npm run publish",
     "postinstall": "npm run build && npm run packandpublish",
     "test": "ts-node ./node_modules/jasmine/bin/jasmine"
   },
-  "devDependencies": {
+  "peerDependencies": {
     "@types/jasmine": "^4.3.5",
     "@types/node": "^20.5.0",
-    "husky": "^8.0.3",
     "jasmine": "^5.1.0",
     "jasmine-core": "^5.1.0",
     "jasmine-spec-reporter": "^7.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
-},
+  },
+  "devDependencies": {
+    "husky": "^8.0.3"
+  },
   "author": "Nathan Syfrig",
   "license": "ISC"
 }
