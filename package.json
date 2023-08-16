@@ -1,9 +1,13 @@
 {
   "name": "metronomes-controller",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Proof of Concept for multiple metronomes back end",
-  "main": "index.ts",
+  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "./dist",
+    "!./index.ts"
+  ],
   "scripts": {
     "afterinstall": "npm run build && npm run packandpublish",
     "build": "tsc --outDir ./dist",
