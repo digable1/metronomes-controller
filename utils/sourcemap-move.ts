@@ -11,7 +11,6 @@ const allowedFileExtension = '.map';
 const excluded = [
     'node_modules',
     'spec',
-    'utils',
     '.git'
 ]
 
@@ -40,13 +39,22 @@ export function moveSourcemap(): void {
     console.log();
 }
 
+function isDirectoryExcluded(directoryParm: string): boolean {
+    excluded.forEach((excludedEntry) => {
+        if (excludedEntry.startsWith(directoryParm)) {
+            return true;
+        }
+    });
+    return false;
+}
+
 function findMapFiles(directory = rootToDist, fileExtensionFilter = allowedFileExtension): Array<fs.Dirent> {
     const newDirContents: Array<fs.Dirent> = [];
-    if (!excluded.includes(directory)) {
+    if (!isDirectoryExcluded(directory)) {
         const dirContents = fs.readdirSync(`${directory}`, { withFileTypes: true });
         dirContents.forEach((dir) => {
             if (!dir.name.startsWith('.')) {
-                if (!excluded.includes(dir.name)) {
+                if (!isDirectoryExcluded(dir.name)) {
                     if (dir.isDirectory()) {
                         newDirContents.push(...findMapFiles(`${directory}${path.sep}${dir.name}`, fileExtensionFilter));
                     } else {
