@@ -1,0 +1,13 @@
+{
+    "rootToDist": "dist",
+    "distSource": "_src",
+    "rootToDistSrc": "dist/_src",
+    "allowedFileExtension": ".map",
+    "excluded": [
+        "node_modules",
+        "spec",
+        ".git"
+    ],
+    "utilsDirectory": "utils",
+    "utilsToRoot": ".."
+}

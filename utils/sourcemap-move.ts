@@ -1,31 +1,43 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const utilsDirectory = 'utils';
+const configurationFile = './sourcemap-move.json';
 
-const distToRoot = '..';
-const rootToDist = 'dist';
-const distSource = '_src'
-const rootToDistSrc = `dist/${distSource}`;
-const allowedFileExtension = '.map';
-const excluded = [
-    'node_modules',
-    'spec',
-    '.git'
-]
+interface SourcemapMoveConfiguration {
+    rootToDist: string;
+    distSource: string,
+    rootToDistSrc: string;
+    allowedFileExtension: string;
+    excluded: Array<string>;
+    utilsDirectory: string;
+    utilsToRoot: string;
+}
+
+let configuration: SourcemapMoveConfiguration;
+
+function readConfiguration(file = configurationFile): SourcemapMoveConfiguration {
+    try {
+        return JSON.parse(fs.readFileSync(file, { encoding: 'utf-8' })) as SourcemapMoveConfiguration;
+    } catch(e) {
+        console.error(`Could not find configuration file '${file}'`);
+        console.error(`    Are you in the same directory as this configuration file?`);
+        process.exit(1);
+    }
+}
 
 export function moveSourcemap(): void {
     const cwd = process.cwd();
-    if (cwd.indexOf(utilsDirectory) < 0) {
-        console.error(`This must be run in the ${utilsDirectory} directory`);
+    configuration = readConfiguration();
+    if (cwd.indexOf(configuration.utilsDirectory) < 0) {
+        console.error(`This must be run in the ${configuration.utilsDirectory} directory`);
         process.exit(1);
     }
-    process.chdir(path.resolve(distToRoot));
+    process.chdir(path.resolve(configuration.utilsToRoot));
     const originalDirectory = process.cwd();
 
     console.log(`Syncing sourcemaps:`);
     console.log(`    Original directory  : ${originalDirectory}`);
-    console.log(`    Desination directory: ${originalDirectory}${rootToDistSrc}`);
+    console.log(`    Desination directory: ${originalDirectory}${configuration.rootToDistSrc}`);
     console.log();
 
     findMapFiles().forEach((dirEntry) => {
@@ -40,7 +52,7 @@ export function moveSourcemap(): void {
 }
 
 function isDirectoryExcluded(directoryParm: string): boolean {
-    excluded.forEach((excludedEntry) => {
+    configuration.excluded.forEach((excludedEntry) => {
         if (excludedEntry.startsWith(directoryParm)) {
             return true;
         }
@@ -48,7 +60,7 @@ function isDirectoryExcluded(directoryParm: string): boolean {
     return false;
 }
 
-function findMapFiles(directory = rootToDist, fileExtensionFilter = allowedFileExtension): Array<fs.Dirent> {
+function findMapFiles(directory = configuration.rootToDist, fileExtensionFilter = configuration.allowedFileExtension): Array<fs.Dirent> {
     const newDirContents: Array<fs.Dirent> = [];
     if (!isDirectoryExcluded(directory)) {
         const dirContents = fs.readdirSync(`${directory}`, { withFileTypes: true });
@@ -83,7 +95,7 @@ function removeParentPaths(source: string): string {
     return currentSource;
 }
 
-function changeMapSourcesPath(mapPath: string, newSource = distSource): Object {
+function changeMapSourcesPath(mapPath: string, newSource = configuration.distSource): Object {
     const encoding = 'utf-8';
     const contents = fs.readFileSync(mapPath, { encoding: encoding });
     const mapDefinition = JSON.parse(contents);
@@ -132,7 +144,7 @@ function changeMapSourcesPath(mapPath: string, newSource = distSource): Object {
     
 }
 
-function copySources(mapDefinition: any, distLocation = rootToDist, newSource = distSource): void {
+function copySources(mapDefinition: any, distLocation = configuration.rootToDist, newSource = configuration.distSource): void {
     const sources = mapDefinition.sources as Array<string>;
 
     sources.forEach((source) => {
