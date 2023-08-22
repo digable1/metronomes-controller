@@ -79,6 +79,31 @@ export function getHemiolaBuilder(): Array<ClicksBuilder> {
     ]
 }
 
+function completeStartParameter(callbacks: Array<(callback: ClickPayload) => void>, partialBuilder: () => Array<ClicksBuilder>): MetronomeClicks {
+    const returnPartialBuilder = partialBuilder();
+    const returnObjects: Array<Clicks> = [];
+    for (let callbackIndex = 0; callbackIndex < callbacks.length; ++callbackIndex) {
+        returnObjects.push(returnPartialBuilder[callbackIndex]
+                .withCallback(callbacks[callbackIndex])
+            .build());
+    }
+    return {
+        clicks: returnObjects
+    } as MetronomeClicks;
+}
+export function getQuarternotesStartParameter(callbacks: Array<(callback: ClickPayload) => void>): MetronomeClicks {
+    return completeStartParameter(callbacks, getQuarterNotesBuilder_4_4);
+}
+export function getEighthNotesEmphasis_4_4StartParameter(callbacks: Array<(callback: ClickPayload) => void>): MetronomeClicks {
+    return completeStartParameter(callbacks, getEighthNotesEmphasisBuilder_4_4);
+}
+export function getBlueRondoALaTurkSFirstMeasureStartParameter(callbacks: Array<(callback: ClickPayload) => void>): MetronomeClicks {
+    return completeStartParameter(callbacks, getBlueRondoALaTurkFirstMeasureBuilder);
+}
+export function getHemiolaStartParameter(callbacks: Array<(callback: ClickPayload) => void>): MetronomeClicks {
+    return completeStartParameter(callbacks, getHemiolaBuilder);
+}
+
 const quarterNotes_4_4: MetronomeClicks = {
     clicks: [
         getQuarterNotesBuilder_4_4()[0]

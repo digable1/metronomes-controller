@@ -1,19 +1,20 @@
 import { heartbeatToTempo, tempoToHeartbeat } from '../src/ts/utils/tempo-conversion';
-import { ClickPayload } from '../clicks';
+import { ClickPayload, Clicks } from '../clicks';
 import {
     quarternotes44Label,
     eighthnotes44Label,
     getQuarterNotesBuilder_4_4,
-    getEighthNotesEmphasisBuilder_4_4,
-    getBlueRondoALaTurkFirstMeasureBuilder,
-    getHemiolaBuilder,
+    getQuarternotesStartParameter,
+    getEighthNotesEmphasis_4_4StartParameter,
     rondoMelodyLabel,
     rondoLeftHandLabel,
     setDebugClickbaseRanges,
     start,
     stop,
     hemiolaTripletsLabel,
-    hemiolaDupletsLabel
+    hemiolaDupletsLabel,
+    getBlueRondoALaTurkSFirstMeasureStartParameter,
+    getHemiolaStartParameter
 } from '../index';
 
 interface CallbackAttributes {
@@ -129,14 +130,11 @@ describe(`Package Test basic metronomes should at least somewhat work`, () => {
     it(`Should start 1 4/4 metronome if start called appropriately`, () => {
         jasmine.clock().install().mockDate();
 
-        const startMetronome = {
-            clicks: [
-                getQuarterNotesBuilder_4_4()[0].withCallback(quarternoteCallback).build()
-            ]
-        }
+        const startMetronome = getQuarternotesStartParameter([ quarternoteCallback ]);
         quarternoteCallbackAttributes.currentId = quarternotes44Label;
-        quarternoteCallbackAttributes.currentDuration = Array.isArray(startMetronome.clicks[0].heartbeats) ? startMetronome.clicks[0].heartbeats[startMetronome.clicks[0].clickIndex]
-            : startMetronome.clicks[0].heartbeats;
+        const startMetronomeClicks = startMetronome.clicks as Array<Clicks>;
+        quarternoteCallbackAttributes.currentDuration = Array.isArray(startMetronomeClicks[0].heartbeats) ? startMetronomeClicks[0].heartbeats[startMetronomeClicks[0].clickIndex]
+            : startMetronomeClicks[0].heartbeats;
 
         start(startMetronome);
 
@@ -171,20 +169,15 @@ describe(`Package Test basic metronomes should at least somewhat work`, () => {
     it(`Should start a 4/4 metronome with eighth notes`, () => {
         jasmine.clock().install().mockDate();
 
-        const clickBuilders = getEighthNotesEmphasisBuilder_4_4();
-        const startMetronome = {
-            clicks: [
-                clickBuilders[0].withCallback(quarternoteCallback).build(),
-                clickBuilders[1].withCallback(eighthnoteCallback).build()
-            ]
-        }
+        const startMetronome = getEighthNotesEmphasis_4_4StartParameter([ quarternoteCallback, eighthnoteCallback ]);
         quarternoteCallbackAttributes.currentId = quarternotes44Label;
-        quarternoteCallbackAttributes.currentDuration = Array.isArray(startMetronome.clicks[0].heartbeats) ? startMetronome.clicks[0].heartbeats[startMetronome.clicks[0].clickIndex]
-            : startMetronome.clicks[0].heartbeats;
+        const startMetronomeClicks = startMetronome.clicks as Array<Clicks>;
+        quarternoteCallbackAttributes.currentDuration = Array.isArray(startMetronomeClicks[0].heartbeats) ? startMetronomeClicks[0].heartbeats[startMetronomeClicks[0].clickIndex]
+            : startMetronomeClicks[0].heartbeats;
 
         eighthnoteCallbackAttributes.currentId = eighthnotes44Label;
-        eighthnoteCallbackAttributes.currentDuration = Array.isArray(startMetronome.clicks[1].heartbeats) ? startMetronome.clicks[1].heartbeats[startMetronome.clicks[1].clickIndex]
-            : startMetronome.clicks[1].heartbeats;
+        eighthnoteCallbackAttributes.currentDuration = Array.isArray(startMetronomeClicks[1].heartbeats) ? startMetronomeClicks[1].heartbeats[startMetronomeClicks[1].clickIndex]
+            : startMetronomeClicks[1].heartbeats;
 
         start(startMetronome);
 
@@ -253,19 +246,14 @@ describe(`Package Test basic metronomes should at least somewhat work`, () => {
     it(`Should start Blue Rondo A La Turk first measure`, () => {
         jasmine.clock().install().mockDate();
 
-        const clickBuilders = getBlueRondoALaTurkFirstMeasureBuilder();
-        const startMetronome = {
-            clicks: [
-                clickBuilders[0].withCallback(rondoMelodyCallback).build(),
-                clickBuilders[1].withCallback(rondoLefthandCallback).build()
-            ]
-        }
+        const startMetronome = getBlueRondoALaTurkSFirstMeasureStartParameter([ rondoMelodyCallback, rondoLefthandCallback ]);
         rondoMelodyCallbackAttributes.currentId = rondoMelodyLabel;
-        rondoMelodyCallbackAttributes.currentDuration = Array.isArray(startMetronome.clicks[0].heartbeats) ? startMetronome.clicks[0].heartbeats[startMetronome.clicks[0].clickIndex]
-            : startMetronome.clicks[0].heartbeats;
+        const startMetronomeClicks = startMetronome.clicks as Array<Clicks>;
+        rondoMelodyCallbackAttributes.currentDuration = Array.isArray(startMetronomeClicks[0].heartbeats) ? startMetronomeClicks[0].heartbeats[startMetronomeClicks[0].clickIndex]
+            : startMetronomeClicks[0].heartbeats;
         rondoLeftHandCallbackAttributes.currentId = rondoLeftHandLabel;
-        rondoLeftHandCallbackAttributes.currentDuration = Array.isArray(startMetronome.clicks[1].heartbeats) ? startMetronome.clicks[1].heartbeats[startMetronome.clicks[1].clickIndex]
-            : startMetronome.clicks[1].heartbeats;
+        rondoLeftHandCallbackAttributes.currentDuration = Array.isArray(startMetronomeClicks[1].heartbeats) ? startMetronomeClicks[1].heartbeats[startMetronomeClicks[1].clickIndex]
+            : startMetronomeClicks[1].heartbeats;
 
         // setDebugClickbaseRanges([
         //     {id: rondoLeftHandLabel, start: -1, end: -1}
@@ -329,7 +317,7 @@ describe(`Package Test basic metronomes should at least somewhat work`, () => {
         expect(rondoLeftHandCallbackAttributes.callbackRun).withContext(`Before fifth eighth note callbackRun`).toBeFalse();
         rondoMelodyCallbackAttributes.callbackRun = false;
 
-        const startMetronomeClicks = startMetronome.clicks[1];
+        const leftHandStartMetronomeClicks = startMetronomeClicks[1];
         rondoLabels.melody = 'Rondo melody group of 3 E';
         rondoLabels.leftHand = 'Rondo left hand group of 3 dotted quarter note duration';
         jasmine.clock().tick(260);
@@ -347,9 +335,9 @@ describe(`Package Test basic metronomes should at least somewhat work`, () => {
 
         rondoLabels.melody = 'Rondo melody group of 3 G';
         rondoLabels.leftHand = 'Before Rondo left hand end dotted quarter note 2';
-        const nextTempoHeartbeatIndex = startMetronomeClicks.tempoHeartbeatIndex + 1;
-        rondoLeftHandCallbackAttributes.currentDuration = Array.isArray(startMetronomeClicks.heartbeats) ? startMetronomeClicks.heartbeats[nextTempoHeartbeatIndex]
-            : startMetronomeClicks.heartbeats;
+        const nextTempoHeartbeatIndex = leftHandStartMetronomeClicks.tempoHeartbeatIndex + 1;
+        rondoLeftHandCallbackAttributes.currentDuration = Array.isArray(leftHandStartMetronomeClicks.heartbeats) ? leftHandStartMetronomeClicks.heartbeats[nextTempoHeartbeatIndex]
+            : leftHandStartMetronomeClicks.heartbeats;
         jasmine.clock().tick(260);
         expect(rondoMelodyCallbackAttributes.callbackRun).withContext(rondoLabels.melody).toBeTrue();
         expect(rondoLeftHandCallbackAttributes.callbackRun).withContext(rondoLabels.leftHand).toBeTrue();
@@ -371,19 +359,14 @@ describe(`Package Test basic metronomes should at least somewhat work`, () => {
     it(`Should start a hemiola (3 against 2) measure`, () => {
         jasmine.clock().install().mockDate();
 
-        const clickBuilders = getHemiolaBuilder();
-        const startMetronome = {
-            clicks: [
-                clickBuilders[0].withCallback(hemiolaTripletsCallback).build(),
-                clickBuilders[1].withCallback(hemiolaDupletsCallback).build()
-            ]
-        }
+        const startMetronome = getHemiolaStartParameter([ hemiolaTripletsCallback, hemiolaDupletsCallback ]);
         hemiolaTripletsCallbackAttributes.currentId = hemiolaTripletsLabel;
-        hemiolaTripletsCallbackAttributes.currentDuration = Array.isArray(startMetronome.clicks[0].heartbeats) ? startMetronome.clicks[0].heartbeats[startMetronome.clicks[0].clickIndex]
-            : startMetronome.clicks[0].heartbeats;
+        const startMetronomeClicks = startMetronome.clicks as Array<Clicks>;
+        hemiolaTripletsCallbackAttributes.currentDuration = Array.isArray(startMetronomeClicks[0].heartbeats) ? startMetronomeClicks[0].heartbeats[startMetronomeClicks[0].clickIndex]
+            : startMetronomeClicks[0].heartbeats;
         hemiolaDupletsCallbackAttributes.currentId = hemiolaDupletsLabel;
-        hemiolaDupletsCallbackAttributes.currentDuration = Array.isArray(startMetronome.clicks[1].heartbeats) ? startMetronome.clicks[1].heartbeats[startMetronome.clicks[1].clickIndex]
-            : startMetronome.clicks[1].heartbeats;
+        hemiolaDupletsCallbackAttributes.currentDuration = Array.isArray(startMetronomeClicks[1].heartbeats) ? startMetronomeClicks[1].heartbeats[startMetronomeClicks[1].clickIndex]
+            : startMetronomeClicks[1].heartbeats;
 
         // setDebugClickbaseRanges([
         //     {id: hemiolaDupletsLabel, start: -1, end: -1}
