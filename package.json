@@ -19,6 +19,9 @@
     "test": "ts-node ./node_modules/jasmine/bin/jasmine",
     "zaptarballs": "rm *.tgz || del *.tgz"
   },
+  "dependencies": {
+    "ts-command-line-args": "2.5.1"
+  },
   "peerDependencies": {
     "@types/jasmine": "^4.3.5",
     "@types/node": "^20.5.0",

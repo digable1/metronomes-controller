@@ -1,7 +1,23 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { parse } from 'ts-command-line-args';
 
 const configurationFile = './sourcemap-move.json';
+
+interface SourcemapMoveParameters {
+    quiet?: boolean;
+    help?: boolean;
+}
+
+export const sourcemapMoveParameters = parse<SourcemapMoveParameters>({
+    quiet: { type: Boolean, optional: true, alias: 'q', description: 'Suppresses status/log messages' },
+    help: { type: Boolean, optional: true, alias: 'h', description: 'Help' }
+},
+{
+    helpArg: 'help',
+    headerContentSections: [{ header: 'Sourcemap Move', content: 'Command to copy source files to \'dest\' location for use cases where original locations get in the way'}],
+    footerContentSections: [{ header: '(c) digable1', content: 'Open Source License (TBD - likely Apache 2' }]
+});
 
 interface SourcemapMoveConfiguration {
     rootToDist: string;
@@ -35,10 +51,12 @@ export function moveSourcemap(): void {
     process.chdir(path.resolve(configuration.utilsToRoot));
     const originalDirectory = process.cwd();
 
-    console.log(`Syncing sourcemaps:`);
-    console.log(`    Original directory  : ${originalDirectory}`);
-    console.log(`    Desination directory: ${originalDirectory}${configuration.rootToDistSrc}`);
-    console.log();
+    if (!sourcemapMoveParameters.quiet) {
+        console.log(`Syncing sourcemaps:`);
+        console.log(`    Original directory  : ${originalDirectory}`);
+        console.log(`    Desination directory: ${originalDirectory}${configuration.rootToDistSrc}`);
+        console.log();
+    }
 
     findMapFiles().forEach((dirEntry) => {
         const mapObject = changeMapSourcesPath(`${dirEntry.name}`);
@@ -46,9 +64,11 @@ export function moveSourcemap(): void {
         fs.writeFileSync(`${dirEntry.name}`, JSON.stringify(mapObject), { encoding: 'utf-8' });
     });
     process.chdir(cwd);
-    console.log();
-    console.log(`Done`);
-    console.log();
+    if (!sourcemapMoveParameters.quiet) {
+        console.log();
+        console.log(`Done`);
+        console.log();
+    }
 }
 
 function isDirectoryExcluded(directoryParm: string): boolean {
@@ -102,13 +122,17 @@ function changeMapSourcesPath(mapPath: string, newSource = configuration.distSou
     const sources = mapDefinition.sources as Array<string> | undefined;
 
     if (sources && mapPath.indexOf(newSource) < 0) {
-        console.log(`    Map file '${mapPath}':`);
+        if (!sourcemapMoveParameters.quiet) {
+            console.log(`    Map file '${mapPath}':`);
+        }
         for (let sourceIndex = 0; sourceIndex < sources.length; ++sourceIndex) {
             const originalSource = sources[sourceIndex];
             if (originalSource.indexOf(newSource) < 0) {
                 sources[sourceIndex] = changeSourcePath(sources[sourceIndex], newSource);
             }
-            console.log(`       [original] -> [new]: ${originalSource} -> ${sources[sourceIndex]}`);
+            if (!sourcemapMoveParameters.quiet) {
+                console.log(`       [original] -> [new]: ${originalSource} -> ${sources[sourceIndex]}`);
+            }
         }
     }
     return mapDefinition;
