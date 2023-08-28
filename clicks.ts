@@ -38,5 +38,6 @@ export interface Clicks extends ClicksBase {
 }
 
 export interface MetronomeClicks {
+    presetId?: string;
     clicks: Clicks | Array<Clicks>;
 }
