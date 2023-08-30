@@ -79,7 +79,9 @@ export function getHemiolaBuilder(): Array<ClicksBuilder> {
     ]
 }
 
-function completeStartParameter(callbacks: Array<(callback: ClickPayload) => void>, partialBuilder: () => Array<ClicksBuilder>): MetronomeClicks {
+export type ClickPayloadCallback = (clicksPayload: ClickPayload) => void;
+export const dummyCallback: ClickPayloadCallback = ((callback: ClickPayload) => {});
+function completeStartParameter(callbacks: Array<ClickPayloadCallback>, partialBuilder: () => Array<ClicksBuilder>): MetronomeClicks {
     const returnPartialBuilder = partialBuilder();
     const returnObjects: Array<Clicks> = [];
     for (let callbackIndex = 0; callbackIndex < callbacks.length; ++callbackIndex) {
@@ -91,16 +93,23 @@ function completeStartParameter(callbacks: Array<(callback: ClickPayload) => voi
         clicks: returnObjects
     } as MetronomeClicks;
 }
-export function getQuarternotesStartParameter(callbacks: Array<(callback: ClickPayload) => void>): MetronomeClicks {
+export function buildDummyCallbacks(numberOfMetronomes: number): Array<ClickPayloadCallback> {
+    const callbacks: Array<ClickPayloadCallback> = [];
+    for (let index = 0; index < numberOfMetronomes; ++index) {
+        callbacks.push(dummyCallback);
+    }
+    return callbacks;
+}
+export function getQuarternotesStartParameter(callbacks = buildDummyCallbacks(1)): MetronomeClicks {
     return completeStartParameter(callbacks, getQuarterNotesBuilder_4_4);
 }
-export function getEighthNotesEmphasis_4_4StartParameter(callbacks: Array<(callback: ClickPayload) => void>): MetronomeClicks {
+export function getEighthNotesEmphasis_4_4StartParameter(callbacks = buildDummyCallbacks(2)): MetronomeClicks {
     return completeStartParameter(callbacks, getEighthNotesEmphasisBuilder_4_4);
 }
-export function getBlueRondoALaTurkSFirstMeasureStartParameter(callbacks: Array<(callback: ClickPayload) => void>): MetronomeClicks {
+export function getBlueRondoALaTurkSFirstMeasureStartParameter(callbacks = buildDummyCallbacks(2)): MetronomeClicks {
     return completeStartParameter(callbacks, getBlueRondoALaTurkFirstMeasureBuilder);
 }
-export function getHemiolaStartParameter(callbacks: Array<(callback: ClickPayload) => void>): MetronomeClicks {
+export function getHemiolaStartParameter(callbacks = buildDummyCallbacks(2)): MetronomeClicks {
     return completeStartParameter(callbacks, getHemiolaBuilder);
 }
 
